@@ -9,18 +9,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Monochrome retail floor: black ground, white type, hard edges, inverted blocks for emphasis */
+  /* Black ground, volt type, hard edges, inverted volt blocks for emphasis */
   --ink:#000000;
-  --paper:#ffffff;
+  --paper:#D4EE12;
   --steel:#848586;
   --gunmetal:#1c1c1e;
   --line:#2e2e30;
+  --body:#cfcfcf;
   --font:"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font);-webkit-font-smoothing:antialiased}
-button,input{font-family:inherit}
+button,input,select{font-family:inherit}
 :focus-visible{outline:2px solid var(--paper);outline-offset:3px}
 [hidden]{display:none!important}
 .wrap{max-width:1040px;margin:0 auto;padding:0 20px 64px}
@@ -31,13 +32,13 @@ button,input{font-family:inherit}
 .logo{height:34px;width:auto;display:block}
 .dot{display:inline-block;width:8px;height:8px;background:var(--paper);margin-right:8px;vertical-align:1px}
 
-.setup{margin:20px 0 0;border:1px dashed var(--paper);padding:16px;font-size:13px;line-height:1.6}
+.setup{margin:20px 0 0;border:1px dashed var(--paper);padding:16px;font-size:13px;line-height:1.6;color:var(--body)}
 
 .hero{padding:44px 0 28px;display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:end;border-bottom:1px solid var(--line)}
 h1{margin:0;font-size:clamp(40px,8vw,92px);line-height:.88;font-weight:900;letter-spacing:-.04em;text-transform:uppercase;text-wrap:balance}
 h1 .inv{background:var(--paper);color:var(--ink);padding:0 .08em;display:inline-block;transform:skewX(-10deg)}
 h1 .inv span{display:inline-block;transform:skewX(10deg)}
-.lede{margin:16px 0 0;font-size:14px;line-height:1.6;color:#cfcfcf;max-width:52ch}
+.lede{margin:16px 0 0;font-size:14px;line-height:1.6;color:var(--body);max-width:54ch}
 .count{border:1px solid var(--paper);padding:16px}
 .count .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
 .count .t{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:6px}
@@ -56,30 +57,35 @@ h1 .inv span{display:inline-block;transform:skewX(10deg)}
 .roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .chip{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 12px;background:var(--gunmetal);border:1px solid var(--line);color:var(--paper);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;cursor:pointer;text-align:left;transition:background .15s,border-color .15s}
 .chip:hover{border-color:var(--paper)}
-.chip .st{font-size:10px;font-weight:500;letter-spacing:.1em;color:var(--steel)}
+.chip .st{font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--steel);white-space:nowrap}
+.chip.half{border-color:var(--paper)}
 .chip.in{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .chip.in .st{color:var(--ink)}
 .chip.me{outline:2px solid var(--paper);outline-offset:2px}
 .chip[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--paper);border-color:var(--paper)}
 .chip.in[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
 
-.panel{margin-top:16px;border:1px solid var(--paper);display:grid;grid-template-columns:1fr 1fr}
+.panel{margin-top:16px;border:1px solid var(--paper);display:grid;grid-template-columns:1.25fr 1fr}
 .panel .side{padding:22px;border-right:1px solid var(--line)}
 .panel .side:last-child{border-right:0}
 .who{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
 .who b{display:block;font-size:30px;letter-spacing:-.02em;color:var(--paper);margin-top:4px;font-weight:900}
-.field{display:grid;gap:6px;margin-top:16px}
+.mkt{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.mkt h4{margin:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.mkt h4 .em{font-size:20px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:grid;gap:6px;margin-top:14px}
 .field label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
 .money{display:flex;align-items:center;border-bottom:2px solid var(--paper)}
-.money span{font-size:28px;font-weight:800;padding-right:4px}
-.money input{flex:1;min-width:0;background:transparent;border:0;color:var(--paper);font-size:28px;font-weight:800;padding:8px 0;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.money span{font-size:24px;font-weight:800;padding-right:4px}
+.money input{flex:1;min-width:0;background:transparent;border:0;color:var(--paper);font-size:24px;font-weight:800;padding:8px 0;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .money input::placeholder{color:#444}
 .money input:focus{outline:none}
 .money:focus-within{box-shadow:0 2px 0 var(--paper)}
-.money.pin input{letter-spacing:.3em}
+.money.pin input{letter-spacing:.3em;font-size:28px}
 .hint{font-size:11px;color:var(--steel);min-height:14px}
-.check{display:flex;align-items:center;gap:8px;font-size:12px;color:#bdbdbd;margin-top:12px;cursor:pointer}
-.check input{width:16px;height:16px;accent-color:#fff}
+.check{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--body);margin-top:12px;cursor:pointer}
+.check input{width:16px;height:16px;accent-color:#D4EE12}
 .btn{appearance:none;border:1px solid var(--paper);background:var(--paper);color:var(--ink);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.08em;padding:14px 18px;cursor:pointer}
 .btn:hover{background:var(--ink);color:var(--paper)}
 .btn.ghost{background:transparent;color:var(--paper)}
@@ -87,10 +93,11 @@ h1 .inv span{display:inline-block;transform:skewX(10deg)}
 .btn.sm{font-size:11px;padding:8px 10px}
 .btn:disabled{opacity:.4;cursor:wait}
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:20px}
-.sealed{display:grid;gap:10px;margin-top:14px}
+.sealed{display:grid;gap:8px;margin-top:14px}
+.sealhead{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-top:8px;display:flex;align-items:center;gap:8px}
 .seal{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--gunmetal);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
-.seal b{font-size:20px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
-.rules{font-size:12px;line-height:1.7;color:#bdbdbd;margin:12px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.seal b{font-size:18px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.rules{font-size:12px;line-height:1.7;color:var(--body);margin:12px 0 0;padding:0;list-style:none;display:grid;gap:6px}
 .rules li{padding-left:18px;position:relative}
 .rules li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;background:var(--paper)}
 .msg{font-size:12px;padding:10px 12px;margin-top:12px;border:1px solid var(--paper)}
@@ -100,11 +107,11 @@ h1 .inv span{display:inline-block;transform:skewX(10deg)}
 .podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .pod{border:1px solid var(--paper);padding:18px}
 .pod.main{background:var(--paper);color:var(--ink)}
-.pod .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+.pod .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
 .pod .nm{font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-top:8px}
 .pod .v{font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
-.actuals{display:flex;flex-wrap:wrap;gap:24px;margin:0 0 16px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel)}
-.actuals b{display:block;color:var(--paper);font-size:24px;letter-spacing:-.02em;margin-top:2px}
+.actuals{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:0 0 16px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel)}
+.actuals b{display:block;color:var(--paper);font-size:22px;letter-spacing:-.02em;margin-top:2px}
 .tbl{overflow-x:auto;margin-top:16px;border:1px solid var(--line)}
 table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
 th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -112,16 +119,16 @@ th{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--stee
 th:first-child,td:first-child{text-align:left}
 #resTable th:nth-child(2),#resTable td:nth-child(2){text-align:left}
 tr.top td{background:var(--paper);color:var(--ink);font-weight:700}
+td.best{text-decoration:underline;text-underline-offset:3px}
 
 .admin{margin-top:40px;border:1px dashed var(--steel);padding:20px}
 .admin .tag{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--steel);color:var(--steel);padding:3px 6px}
 .admin h3{margin:10px 0 4px;font-size:18px;text-transform:uppercase}
 .admin p{margin:0;font-size:12px;color:var(--steel);line-height:1.6}
-.agrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
 .toggle{display:flex;align-items:center;gap:10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;margin-top:16px}
-.toggle input{width:18px;height:18px;accent-color:#fff}
+.toggle input{width:18px;height:18px;accent-color:#D4EE12}
 .reset{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
-.reset select,.reset input{background:var(--gunmetal);color:var(--paper);border:1px solid var(--line);padding:10px;font-family:inherit;font-size:13px}
+.reset select,.reset input{background:var(--gunmetal);color:var(--paper);border:1px solid var(--line);padding:10px;font-size:13px}
 
 .foot{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:11px;color:var(--steel);letter-spacing:.06em;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
 .linkbtn{background:none;border:0;color:var(--steel);font:inherit;text-decoration:underline;cursor:pointer;padding:0;letter-spacing:inherit}
@@ -132,9 +139,10 @@ tr.top td{background:var(--paper);color:var(--ink);font-weight:700}
   .panel{grid-template-columns:1fr}
   .panel .side{border-right:0;border-bottom:1px solid var(--line)}
   .podium{grid-template-columns:1fr}
-  .agrid{grid-template-columns:1fr}
+  .actuals{grid-template-columns:1fr 1fr}
   .sh p{display:none}
 }
+@media (max-width:420px){ .pair{grid-template-columns:1fr} }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -152,7 +160,7 @@ tr.top td{background:var(--paper);color:var(--ink);font-weight:700}
   <header class="hero">
     <div>
       <h1>Black Friday<br><span class="inv"><span>Guess</span></span> the number</h1>
-      <p class="lede">Call two numbers: total sales for Black Friday week and for Black Friday day. Use your personal PIN to lock in. Everyone sees that you've played, nobody sees what you said until the reveal.</p>
+      <p class="lede">Four calls: Black Friday week and Black Friday day sales for 🦘 Australia and 🥝 New Zealand. Use your personal PIN to lock in. Everyone sees that you've played, nobody sees what you said until the reveal.</p>
     </div>
     <div class="count" aria-live="polite">
       <div class="lbl">Doors open, Mon 23 Nov</div>
@@ -170,7 +178,7 @@ tr.top td{background:var(--paper);color:var(--ink);font-weight:700}
   </section>
 
   <section class="sec">
-    <div class="sh"><span class="n">01</span><h2>Pick your name</h2><p>White = locked in</p></div>
+    <div class="sh"><span class="n">01</span><h2>Pick your name</h2><p>Filled = all 4 guesses locked in</p></div>
     <div class="roster" id="roster" role="group" aria-label="Team members"></div>
     <div id="entry"></div>
   </section>
@@ -184,45 +192,50 @@ tr.top td{background:var(--paper);color:var(--ink);font-weight:700}
       <div class="row"><button class="btn" id="adminGo" type="button">Unlock</button></div>
     </div>
     <div id="adminBody" hidden>
-      <p>Close entries before trading starts, then enter the actuals and reveal.</p>
+      <p>Close entries before trading starts, then enter all four actuals and reveal.</p>
       <label class="toggle" for="closedT"><input type="checkbox" id="closedT"> Entries closed</label>
-      <div class="agrid">
-        <div class="field"><label for="aWeek">Actual BF week $</label><div class="money"><span>$</span><input id="aWeek" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="aWeekH"></div></div>
-        <div class="field"><label for="aDay">Actual BF day $</label><div class="money"><span>$</span><input id="aDay" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="aDayH"></div></div>
-      </div>
+      <div id="actualFields"></div>
       <div class="row">
         <button class="btn" id="revealBtn" type="button">Reveal results to everyone</button>
         <button class="btn ghost" id="hideBtn" type="button" hidden>Hide results again</button>
         <button class="btn ghost" id="refreshBtn" type="button">Refresh guesses</button>
       </div>
       <div class="reset">
-        <div class="field" style="margin:0"><label for="rName">Reset a PIN</label><select id="rName"></select></div>
+        <div class="field" style="margin:0"><label for="rName">Player</label><select id="rName"></select></div>
         <div class="field" style="margin:0"><label for="rPin">New PIN (4–8 digits)</label><input id="rPin" inputmode="numeric" maxlength="8" autocomplete="off"></div>
         <button class="btn ghost sm" id="rGo" type="button">Set PIN</button>
-        <button class="btn ghost sm" id="dGo" type="button">Delete their guess</button>
+        <button class="btn ghost sm" id="dGo" type="button">Delete their guesses</button>
       </div>
       <div class="tbl"><table id="allTable"></table></div>
     </div>
     <div class="msg" id="adminMsg" hidden></div>
   </section>
 
-  <div class="foot"><span>Guesses are checked and stored on the server. Overall winner = smallest average % miss across both numbers.</span><button class="linkbtn" id="adminOpen" type="button">Organiser</button></div>
+  <div class="foot"><span>Guesses are checked and stored on the server. Overall winner = smallest average % miss across all four numbers.</span><button class="linkbtn" id="adminOpen" type="button">Organiser</button></div>
 </div>
 
 <script>
 /* ===== CONFIG: paste your Apps Script web app URL here ===== */
 const API_URL = "https://script.google.com/macros/s/AKfycbzvOenjbRemolwOKiwkuIngaI-UL8Mi8cJXgTBHXciTmcSQUu3jNKQIs7l9WQW3NXmi/exec";
 const DOORS_OPEN = new Date("2026-11-23T00:00:00+11:00");
-const FALLBACK_NAMES = ["Nina","Adrian","Zac","Mladen","Shaina","Pat","Eluan","Mikey","Deb","Chloe","Aleena","Sean","Hamza","Ricky","Elle","Helen","Jack P","Aodhan","Eloise","Tom","Kristy","Sid","Jack Ou"];
 /* =========================================================== */
 
+/* Each person has two entries in the Sheet: "Name|AU" and "Name|NZ".
+   "_ACTUAL|AU" and "_ACTUAL|NZ" hold the real results (organiser PIN). */
+const MARKETS = [
+  {code:"AU", label:"Australia", emoji:"🦘"},
+  {code:"NZ", label:"New Zealand", emoji:"🥝"}
+];
+const ACTUAL = "_ACTUAL";
+const key = (name,m) => `${name}|${m}`;
+const split = k => { const i=String(k).lastIndexOf("|"); return i<0?null:{name:k.slice(0,i), m:k.slice(i+1)}; };
+
 const $ = id => document.getElementById(id);
-const S = { players: FALLBACK_NAMES.slice(), locked: [], closed:false, revealed:false, status:null,
-            selected:null, me:null, pin:null, mine:null, unlocked:false, editing:false, showMine:false,
+const S = { players:[], lockedKeys:[], closed:false, revealed:false, status:null,
+            selected:null, me:null, pin:null, mine:{}, unlocked:false, editing:false, showMine:false,
             adminPin:null, all:null };
 const store = { get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}, del(k){try{localStorage.removeItem(k)}catch(e){}} };
 
-/* ---- logo: shows only if logo.png is in the repo ---- */
 (function(){const l=$("logo");l.addEventListener("load",()=>{l.hidden=false});l.addEventListener("error",()=>{l.remove()});if(l.complete&&l.naturalWidth)l.hidden=false})();
 
 /* ---- API ---- */
@@ -234,6 +247,7 @@ async function api(body){
   if(!j.ok) throw new Error(j.error||"Something went wrong.");
   return j.data;
 }
+const cleanErr = e => String(e.message||e).replace(/\|(AU|NZ)\b/g,"").replace(/_ACTUAL/g,"Results");
 
 /* ---- money ---- */
 function parseMoney(v){
@@ -257,9 +271,12 @@ function tick(){
 }
 tick(); setInterval(tick,30000);
 
-/* ---- status polling ---- */
+/* ---- status ---- */
+function marketsLocked(name){ return MARKETS.filter(m=>S.lockedKeys.includes(key(name,m.code))).length; }
 function applyStatus(st){
-  S.status=st; S.players=st.players&&st.players.length?st.players:S.players; S.locked=st.locked||[];
+  S.status=st;
+  const names=[]; (st.players||[]).forEach(k=>{const p=split(k); if(p&&p.name!==ACTUAL&&!names.includes(p.name)) names.push(p.name)});
+  S.players=names; S.lockedKeys=st.locked||[];
   S.closed=!!st.closed; S.revealed=!!st.revealed;
   if(S.closed) S.editing=false;
   renderRoster(); if(!S.editing) renderEntry(); renderResults(); renderAdminState();
@@ -273,26 +290,27 @@ async function refresh(){
 /* ---- roster ---- */
 function renderRoster(){
   const r=$("roster"); r.replaceChildren();
+  let full=0;
   S.players.forEach(name=>{
-    const isIn=S.locked.includes(name), mine=S.unlocked&&S.me===name;
-    const b=el("button",{type:"button",class:"chip"+(isIn?" in":"")+(mine?" me":""),"aria-pressed":String(S.selected===name)},[
-      el("span",{text:name}), el("span",{class:"st",text: mine?(isIn?"YOU ✓":"YOU"): isIn?"LOCKED ✓":"OPEN"})
-    ]);
+    const n=marketsLocked(name), isIn=n===MARKETS.length, mine=S.unlocked&&S.me===name;
+    if(isIn) full++;
+    const st = isIn ? (mine?"YOU ✓":"🦘🥝 ✓") : n ? MARKETS.filter(m=>S.lockedKeys.includes(key(name,m.code))).map(m=>m.emoji).join("")+" ✓" : (mine?"YOU":"OPEN");
+    const b=el("button",{type:"button",class:"chip"+(isIn?" in":n?" half":"")+(mine?" me":""),"aria-pressed":String(S.selected===name)},[el("span",{text:name}),el("span",{class:"st",text:st})]);
     b.addEventListener("click",()=>{
-      if(S.unlocked && S.me!==name){ signOut(false); }
+      if(S.unlocked && S.me!==name) signOut(false);
       S.selected=name; S.editing=false; renderRoster(); renderEntry();
       setTimeout(()=>{const p=$("pinIn");if(p)p.focus({preventScroll:true}); $("entry").scrollIntoView({behavior:"smooth",block:"nearest"})},0);
     });
     r.append(b);
   });
-  $("lockedN").textContent=`${S.locked.length}/${S.players.length}`;
-  $("meter").style.width=(S.players.length?S.locked.length/S.players.length*100:0)+"%";
+  $("lockedN").textContent=`${full}/${S.players.length}`;
+  $("meter").style.width=(S.players.length?full/S.players.length*100:0)+"%";
 }
 
 /* ---- entry ---- */
-const RULES = () => `<ul class="rules"><li>Two numbers: BF week total and BF day total, in dollars.</li><li>Change your guess any time until the organiser closes entries.</li><li>Closest overall (average % miss) wins. Prizes for closest week and closest day too.</li></ul>`;
-function msgBox(id){ return `<div class="msg" id="${id}" hidden></div>`; }
+const RULES = () => `<ul class="rules"><li>Four numbers: 🦘 Australia week and day, 🥝 New Zealand week and day, in dollars.</li><li>Change your guesses any time until the organiser closes entries.</li><li>Closest overall (average % miss across all four) wins. Prizes for best 🦘 and best 🥝 too.</li></ul>`;
 function say(id,text,err){ const m=$(id); if(!m) return; m.textContent=text; m.hidden=!text; m.classList.toggle("err",!!err); }
+const hasAll = () => MARKETS.every(m=>S.mine[m.code]);
 
 function renderEntry(){
   const e=$("entry");
@@ -306,7 +324,7 @@ function renderEntry(){
       <div class="field"><label for="pinIn">Your PIN</label><div class="money pin"><input id="pinIn" type="password" inputmode="numeric" autocomplete="off" maxlength="8"></div><div class="hint">The PIN the organiser sent you.</div></div>
       <label class="check" for="remember"><input type="checkbox" id="remember" checked> Remember me on this device</label>
       <div class="row"><button class="btn" id="unlockBtn" type="button">Unlock</button><button class="btn ghost" id="notMe" type="button">Not me</button></div>
-      ${msgBox("entryMsg")}
+      <div class="msg" id="entryMsg" hidden></div>
     </div><div class="side"><div class="who">How it works</div>${RULES()}</div></div>`;
     e.querySelector(".who b").textContent=name;
     const go=()=>unlock(name,$("pinIn").value.trim(),$("remember").checked);
@@ -316,98 +334,150 @@ function renderEntry(){
     return;
   }
 
-  const editing = !S.closed && (S.editing || !S.mine);
+  const editing = !S.closed && (S.editing || !hasAll());
   if(editing){
+    const block = m => `<div class="mkt"><h4><span class="em">${m.emoji}</span>${m.label}</h4><div class="pair">
+      <div class="field"><label for="w${m.code}">BF week $</label><div class="money"><span>$</span><input id="w${m.code}" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="w${m.code}H">Tip: 1.25m or 850k works too</div></div>
+      <div class="field"><label for="d${m.code}">BF day $</label><div class="money"><span>$</span><input id="d${m.code}" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="d${m.code}H"></div></div>
+    </div></div>`;
     e.innerHTML=`<div class="panel"><div class="side">
       <div class="who">Playing as<b></b></div>
-      <div class="field"><label for="gWeek">Black Friday week $</label><div class="money"><span>$</span><input id="gWeek" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="gWeekH">Tip: 1.25m or 850k works too</div></div>
-      <div class="field"><label for="gDay">Black Friday day $</label><div class="money"><span>$</span><input id="gDay" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="gDayH">Tip: 1.25m or 850k works too</div></div>
-      <div class="row"><button class="btn" id="lockBtn" type="button">Lock it in</button>${S.mine?`<button class="btn ghost" id="cancelBtn" type="button">Cancel</button>`:""}<button class="btn ghost" id="outBtn" type="button">Sign out</button></div>
-      ${msgBox("entryMsg")}
+      ${MARKETS.map(block).join("")}
+      <div class="row"><button class="btn" id="lockBtn" type="button">Lock all 4 in</button>${hasAll()?`<button class="btn ghost" id="cancelBtn" type="button">Cancel</button>`:""}<button class="btn ghost" id="outBtn" type="button">Sign out</button></div>
+      <div class="msg" id="entryMsg" hidden></div>
     </div><div class="side"><div class="who">How it works</div>${RULES()}</div></div>`;
     e.querySelector(".who b").textContent=name;
-    const w=$("gWeek"),d=$("gDay");
-    if(S.mine){w.value=S.mine.week;d.value=S.mine.day}
-    [[w,$("gWeekH")],[d,$("gDayH")]].forEach(([i,h])=>{i.addEventListener("input",()=>hintFor(i,h)); if(i.value) hintFor(i,h)});
+    MARKETS.forEach(m=>{
+      const g=S.mine[m.code];
+      [["w","week"],["d","day"]].forEach(([p,f])=>{
+        const i=$(p+m.code), h=$(p+m.code+"H");
+        if(g) i.value=g[f];
+        i.addEventListener("input",()=>hintFor(i,h)); if(i.value) hintFor(i,h);
+      });
+    });
     $("lockBtn").addEventListener("click",submit);
     if($("cancelBtn")) $("cancelBtn").addEventListener("click",()=>{S.editing=false;renderEntry()});
     $("outBtn").addEventListener("click",()=>signOut(true));
-    w.focus({preventScroll:true});
+    $("wAU").focus({preventScroll:true});
   } else {
-    const g=S.mine, show=S.showMine;
+    const show=S.showMine, any=MARKETS.some(m=>S.mine[m.code]);
+    const sealed = m => { const g=S.mine[m.code]; return `<div class="sealhead"><span>${m.emoji}</span>${m.label}</div>
+      <div class="seal"><span>BF week</span><b>${g?(show?fmt(g.week):"$ ••••••"):"—"}</b></div>
+      <div class="seal"><span>BF day</span><b>${g?(show?fmt(g.day):"$ ••••••"):"—"}</b></div>`; };
     e.innerHTML=`<div class="panel"><div class="side">
-      <div class="who">${g?"Locked in":"Entries closed"}<b></b></div>
-      ${g?`<div class="sealed">
-        <div class="seal"><span>BF week</span><b>${show?fmt(g.week):"$ ••••••"}</b></div>
-        <div class="seal"><span>BF day</span><b>${show?fmt(g.day):"$ ••••••"}</b></div>
-      </div>`:`<p class="lede" style="font-size:12px">You didn't lock in a guess before entries closed.</p>`}
+      <div class="who">${hasAll()?"Locked in":"Entries closed"}<b></b></div>
+      ${any?`<div class="sealed">${MARKETS.map(sealed).join("")}</div>`:`<p class="lede" style="font-size:12px">You didn't lock in guesses before entries closed.</p>`}
       <div class="row">
-        ${g?`<button class="btn ghost" id="peekMine" type="button">${show?"Hide":"Show"} my guess</button>`:""}
-        ${S.closed?"":`<button class="btn" id="editBtn" type="button">Change guess</button>`}
+        ${any?`<button class="btn ghost" id="peekMine" type="button">${show?"Hide":"Show"} my guesses</button>`:""}
+        ${S.closed?"":`<button class="btn" id="editBtn" type="button">Change guesses</button>`}
         <button class="btn ghost" id="outBtn" type="button">Sign out</button>
       </div>
-      ${msgBox("entryMsg")}
+      <div class="msg" id="entryMsg" hidden></div>
     </div><div class="side"><div class="who">${S.closed?"Entries closed":"You're in"}</div>${S.closed?`<p class="lede" style="font-size:12px">No more changes. Results land at the top of this page once the organiser reveals.</p>`:RULES()}</div></div>`;
-    e.querySelector(".who b").textContent=name+(g?" ✓":"");
+    e.querySelector(".who b").textContent=name+(hasAll()?" ✓":"");
     if($("peekMine")) $("peekMine").addEventListener("click",()=>{S.showMine=!S.showMine;renderEntry()});
     if($("editBtn")) $("editBtn").addEventListener("click",()=>{S.editing=true;renderEntry()});
     $("outBtn").addEventListener("click",()=>signOut(true));
   }
 }
 
+async function loadMine(name,pin){
+  const out={};
+  for(const m of MARKETS){ const r=await api({action:"mine",name:key(name,m.code),pin}); out[m.code]=r.guess; }
+  return out;
+}
 async function unlock(name,pin,remember){
   if(!/^\d{4,8}$/.test(pin)){ say("entryMsg","Enter your PIN (numbers only).",true); return; }
   const b=$("unlockBtn"); b.disabled=true; b.textContent="Checking…";
   try{
-    const r=await api({action:"mine",name,pin});
-    S.me=name; S.pin=pin; S.unlocked=true; S.mine=r.guess; S.selected=name; S.showMine=false; S.editing=false;
+    const mine=await loadMine(name,pin);
+    Object.assign(S,{me:name,pin,unlocked:true,mine,selected:name,showMine:false,editing:false});
     if(remember) store.set("bf26_me",{name,pin}); else store.del("bf26_me");
     renderRoster(); renderEntry();
-  }catch(err){ say("entryMsg",err.message,true); b.disabled=false; b.textContent="Unlock"; }
+  }catch(err){ say("entryMsg",cleanErr(err),true); b.disabled=false; b.textContent="Unlock"; }
 }
 function signOut(clearSel){
-  S.me=null;S.pin=null;S.unlocked=false;S.mine=null;S.editing=false;S.showMine=false; if(clearSel) S.selected=null;
+  Object.assign(S,{me:null,pin:null,unlocked:false,mine:{},editing:false,showMine:false}); if(clearSel) S.selected=null;
   store.del("bf26_me"); renderRoster(); renderEntry();
 }
 async function submit(){
-  const week=parseMoney($("gWeek").value), day=parseMoney($("gDay").value);
-  if(isNaN(week)||week<=0){ say("entryMsg","Enter your Black Friday week number.",true); $("gWeek").focus(); return; }
-  if(isNaN(day)||day<=0){ say("entryMsg","Enter your Black Friday day number.",true); $("gDay").focus(); return; }
-  if(day>week){ say("entryMsg","Your day guess is bigger than your week guess. Double-check it.",true); return; }
+  const vals={};
+  for(const m of MARKETS){
+    const week=parseMoney($("w"+m.code).value), day=parseMoney($("d"+m.code).value);
+    if(isNaN(week)||week<=0){ say("entryMsg",`Enter your ${m.emoji} ${m.label} week number.`,true); $("w"+m.code).focus(); return; }
+    if(isNaN(day)||day<=0){ say("entryMsg",`Enter your ${m.emoji} ${m.label} day number.`,true); $("d"+m.code).focus(); return; }
+    if(day>week){ say("entryMsg",`Your ${m.emoji} ${m.label} day guess is bigger than the week guess. Double-check it.`,true); return; }
+    vals[m.code]={week,day};
+  }
   const b=$("lockBtn"); b.disabled=true; b.textContent="Locking…";
   try{
-    const r=await api({action:"submit",name:S.me,pin:S.pin,week,day});
-    S.mine=r.guess; S.editing=false; S.showMine=false;
-    if(!S.locked.includes(S.me)) S.locked=S.locked.concat(S.me);
-    renderRoster(); renderEntry(); say("entryMsg","Locked in. Your numbers are sealed.");
+    for(const m of MARKETS){
+      const r=await api({action:"submit",name:key(S.me,m.code),pin:S.pin,week:vals[m.code].week,day:vals[m.code].day});
+      S.mine[m.code]=r.guess;
+      if(!S.lockedKeys.includes(key(S.me,m.code))) S.lockedKeys=S.lockedKeys.concat(key(S.me,m.code));
+    }
+    S.editing=false; S.showMine=false;
+    renderRoster(); renderEntry(); say("entryMsg","All 4 locked in. Your numbers are sealed.");
     refresh();
-  }catch(err){ say("entryMsg",err.message,true); b.disabled=false; b.textContent="Lock it in"; }
+  }catch(err){ say("entryMsg",cleanErr(err)+(MARKETS.some(m=>S.mine[m.code])?" Some guesses may have saved: check and lock in again.":""),true); b.disabled=false; b.textContent="Lock all 4 in"; }
 }
 
 /* ---- results ---- */
+function scoreRows(results){
+  const byKey={}; results.forEach(r=>byKey[r.name]=r);
+  const act={}; MARKETS.forEach(m=>act[m.code]=byKey[key(ACTUAL,m.code)]);
+  if(MARKETS.some(m=>!act[m.code]||!(act[m.code].week>0)||!(act[m.code].day>0))) return null;
+  const people={};
+  results.forEach(r=>{const p=split(r.name); if(!p||p.name===ACTUAL) return; (people[p.name]=people[p.name]||{name:p.name})[p.m]=r;});
+  const miss=(g,a)=>Math.abs(g-a)/a*100;
+  const rows=Object.values(people).filter(p=>MARKETS.every(m=>p[m.code])).map(p=>{
+    const o={name:p.name};
+    MARKETS.forEach(m=>{const g=p[m.code],a=act[m.code];
+      o[m.code]={week:g.week,day:g.day,ew:miss(g.week,a.week),ed:miss(g.day,a.day)};
+      o[m.code].avg=(o[m.code].ew+o[m.code].ed)/2;});
+    o.avg=MARKETS.reduce((s,m)=>s+o[m.code].avg,0)/MARKETS.length;
+    return o;
+  });
+  return {act,rows};
+}
 function renderResults(){
   const st=S.status||{}, sec=$("resultsSec");
-  if(!st.revealed||!Array.isArray(st.results)||!(st.actualWeek>0)||!(st.actualDay>0)){ sec.hidden=true; return; }
+  const sc = st.revealed&&Array.isArray(st.results) ? scoreRows(st.results) : null;
+  if(!sc){ sec.hidden=true; return; }
   sec.hidden=false;
-  const aw=st.actualWeek, ad=st.actualDay;
-  const rows=st.results.filter(r=>r.week>0&&r.day>0).map(r=>{const ew=Math.abs(r.week-aw)/aw*100, ed=Math.abs(r.day-ad)/ad*100; return {...r,ew,ed,avg:(ew+ed)/2}});
-  $("actuals").innerHTML=`<div>Actual BF week<b>${fmt(aw)}</b></div><div>Actual BF day<b>${fmt(ad)}</b></div><div>Players<b>${rows.length}</b></div>`;
+  const {act,rows}=sc;
+  $("actuals").replaceChildren(...MARKETS.flatMap(m=>[
+    el("div",{},[document.createTextNode(`${m.emoji} ${m.code} week`),el("b",{text:fmt(act[m.code].week)})]),
+    el("div",{},[document.createTextNode(`${m.emoji} ${m.code} day`),el("b",{text:fmt(act[m.code].day)})])]));
   if(!rows.length){ $("podium").replaceChildren(); $("resTable").replaceChildren(); return; }
-  const best=k=>rows.slice().sort((a,b)=>a[k]-b[k])[0];
-  const o=best("avg"), w=best("ew"), d=best("ed");
+  const best=f=>rows.slice().sort((a,b)=>f(a)-f(b))[0];
+  const o=best(r=>r.avg);
   const pod=(cls,k,nm,v)=>el("div",{class:"pod"+cls},[el("div",{class:"k",text:k}),el("div",{class:"nm",text:nm}),el("div",{class:"v",text:v})]);
   $("podium").replaceChildren(
-    pod(" main","Overall winner",o.name,`Avg miss ${o.avg.toFixed(1)}%`),
-    pod("","Closest BF week",w.name,`${fmt(w.week)} · off ${w.ew.toFixed(1)}%`),
-    pod("","Closest BF day",d.name,`${fmt(d.day)} · off ${d.ed.toFixed(1)}%`));
+    pod(" main","Overall winner",o.name,`Avg miss ${o.avg.toFixed(1)}% across all 4`),
+    ...MARKETS.map(m=>{const w=best(r=>r[m.code].avg);return pod("",`Best ${m.emoji} ${m.label}`,w.name,`Week off ${w[m.code].ew.toFixed(1)}% · day off ${w[m.code].ed.toFixed(1)}%`)}));
+  const mins={}; MARKETS.forEach(m=>["ew","ed"].forEach(f=>mins[m.code+f]=Math.min(...rows.map(r=>r[m.code][f]))));
   const t=$("resTable"); t.replaceChildren();
-  t.append(el("thead",{},[el("tr",{},["#","Name","Week guess","Miss","Day guess","Miss","Avg miss"].map(h=>el("th",{text:h})))]));
+  t.append(el("thead",{},[el("tr",{},["#","Name",...MARKETS.flatMap(m=>[`${m.emoji} week`,"Miss",`${m.emoji} day`,"Miss"]),"Avg miss"].map(h=>el("th",{text:h})))]));
   const tb=el("tbody");
-  rows.sort((a,b)=>a.avg-b.avg).forEach((r,i)=>tb.append(el("tr",{class:i===0?"top":""},[i+1,r.name,fmt(r.week),r.ew.toFixed(1)+"%",fmt(r.day),r.ed.toFixed(1)+"%",r.avg.toFixed(1)+"%"].map(v=>el("td",{text:String(v)})))));
+  rows.sort((a,b)=>a.avg-b.avg).forEach((r,i)=>{
+    const cells=[el("td",{text:String(i+1)}),el("td",{text:r.name})];
+    MARKETS.forEach(m=>{const x=r[m.code];
+      cells.push(el("td",{text:fmt(x.week)}),el("td",{class:x.ew===mins[m.code+"ew"]?"best":"",text:x.ew.toFixed(1)+"%"}),
+                 el("td",{text:fmt(x.day)}),el("td",{class:x.ed===mins[m.code+"ed"]?"best":"",text:x.ed.toFixed(1)+"%"}));});
+    cells.push(el("td",{text:r.avg.toFixed(1)+"%"}));
+    tb.append(el("tr",{class:i===0?"top":""},cells));
+  });
   t.append(tb);
 }
 
 /* ---- organiser ---- */
+$("actualFields").innerHTML = MARKETS.map(m=>`<div class="mkt"><h4><span class="em">${m.emoji}</span>Actual ${m.label}</h4><div class="pair">
+  <div class="field"><label for="a${m.code}w">BF week $</label><div class="money"><span>$</span><input id="a${m.code}w" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="a${m.code}wH"></div></div>
+  <div class="field"><label for="a${m.code}d">BF day $</label><div class="money"><span>$</span><input id="a${m.code}d" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="a${m.code}dH"></div></div>
+</div></div>`).join("");
+MARKETS.forEach(m=>["w","d"].forEach(p=>{const i=$("a"+m.code+p);i.addEventListener("input",()=>hintFor(i,$("a"+m.code+p+"H")))}));
+
 function adminSay(t,err){ say("adminMsg",t,err); }
 $("adminOpen").addEventListener("click",()=>{ $("admin").hidden=!$("admin").hidden; if(!$("admin").hidden){ $("admin").scrollIntoView({behavior:"smooth"}); if(!S.adminPin) $("adminPin").focus({preventScroll:true}); } });
 $("adminGo").addEventListener("click",adminLogin);
@@ -415,10 +485,13 @@ $("adminPin").addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin()});
 async function adminLogin(){
   const pin=$("adminPin").value.trim(); if(!pin) return;
   try{ const r=await api({action:"admin",adminPin:pin,op:"list"}); S.adminPin=pin; S.all=r.guesses; applyStatus(r.status);
-       $("adminLogin").hidden=true; $("adminBody").hidden=false; adminSay(""); renderAll(); }
-  catch(e){ adminSay(e.message,true); }
+       $("adminLogin").hidden=true; $("adminBody").hidden=false; adminSay(""); renderAll(); fillActuals(); }
+  catch(e){ adminSay(cleanErr(e),true); }
 }
 async function adminCall(op,extra){ const r=await api({action:"admin",adminPin:S.adminPin,op,...(extra||{})}); if(r.status) applyStatus(r.status); if(r.guesses){S.all=r.guesses;renderAll()} return r; }
+function fillActuals(){
+  (S.all||[]).forEach(g=>{const p=split(g.name); if(p&&p.name===ACTUAL){ const w=$("a"+p.m+"w"),d=$("a"+p.m+"d"); if(w&&!w.value){w.value=g.week;hintFor(w,$("a"+p.m+"wH"))} if(d&&!d.value){d.value=g.day;hintFor(d,$("a"+p.m+"dH"))} }});
+}
 function renderAdminState(){
   if(!S.adminPin) return;
   $("closedT").checked=S.closed; $("hideBtn").hidden=!S.revealed;
@@ -426,28 +499,46 @@ function renderAdminState(){
 }
 function renderAll(){
   const t=$("allTable"); t.replaceChildren();
-  const rows=(S.all||[]).slice().sort((a,b)=>a.name.localeCompare(b.name));
-  t.append(el("thead",{},[el("tr",{},["Name","Updated","BF week","BF day"].map(h=>el("th",{text:h})))]));
+  const people={};
+  (S.all||[]).forEach(g=>{const p=split(g.name); if(!p||p.name===ACTUAL) return; (people[p.name]=people[p.name]||{name:p.name})[p.m]=g;});
+  const rows=Object.values(people).sort((a,b)=>a.name.localeCompare(b.name));
+  t.append(el("thead",{},[el("tr",{},["Name",...MARKETS.flatMap(m=>[`${m.emoji} week`,`${m.emoji} day`]),"Updated"].map(h=>el("th",{text:h})))]));
   const tb=el("tbody");
   if(!rows.length) tb.append(el("tr",{},[el("td",{text:"No guesses yet."})]));
-  rows.forEach(r=>tb.append(el("tr",{},[r.name, r.at?new Date(r.at).toLocaleString("en-AU",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"", fmt(r.week), fmt(r.day)].map(v=>el("td",{text:v})))));
+  rows.forEach(r=>{
+    const last=MARKETS.map(m=>r[m.code]&&r[m.code].at).filter(Boolean).sort().pop();
+    tb.append(el("tr",{},[r.name,...MARKETS.flatMap(m=>r[m.code]?[fmt(r[m.code].week),fmt(r[m.code].day)]:["—","—"]),
+      last?new Date(last).toLocaleString("en-AU",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):""].map(v=>el("td",{text:v}))));
+  });
   t.append(tb); renderAdminState();
 }
-$("closedT").addEventListener("change",async e=>{ try{ await adminCall("close",{closed:e.target.checked}); adminSay(e.target.checked?"Entries closed. Nobody can change their guess now.":"Entries reopened."); }catch(err){ e.target.checked=S.closed; adminSay(err.message,true);} });
-[["aWeek","aWeekH"],["aDay","aDayH"]].forEach(([i,h])=>$(i).addEventListener("input",()=>hintFor($(i),$(h))));
-$("refreshBtn").addEventListener("click",async()=>{ try{ await adminCall("list"); adminSay("Guesses refreshed."); }catch(e){ adminSay(e.message,true);} });
+$("closedT").addEventListener("change",async e=>{ try{ await adminCall("close",{closed:e.target.checked}); adminSay(e.target.checked?"Entries closed. Nobody can change their guesses now.":"Entries reopened."); }catch(err){ e.target.checked=S.closed; adminSay(cleanErr(err),true);} });
+$("refreshBtn").addEventListener("click",async()=>{ try{ await adminCall("list"); adminSay("Guesses refreshed."); }catch(e){ adminSay(cleanErr(e),true);} });
 $("revealBtn").addEventListener("click",async()=>{
-  const aw=parseMoney($("aWeek").value), ad=parseMoney($("aDay").value);
-  if(isNaN(aw)||aw<=0||isNaN(ad)||ad<=0){ adminSay("Enter both actual numbers first.",true); return; }
-  try{ await adminCall("reveal",{actualWeek:aw,actualDay:ad}); adminSay("Revealed. Everyone sees the leaderboard on their next refresh (within 30 seconds)."); $("resultsSec").scrollIntoView({behavior:"smooth"}); }
-  catch(e){ adminSay(e.message,true); }
+  const v={};
+  for(const m of MARKETS){
+    const w=parseMoney($("a"+m.code+"w").value), d=parseMoney($("a"+m.code+"d").value);
+    if(!(w>0)||!(d>0)){ adminSay(`Enter both ${m.emoji} ${m.label} actuals first.`,true); return; }
+    v[m.code]={w,d};
+  }
+  const b=$("revealBtn"); b.disabled=true; b.textContent="Revealing…";
+  try{
+    // Actuals are saved as the hidden "_ACTUAL" entries, which need entries open for a moment.
+    if(S.closed) await adminCall("close",{closed:false});
+    for(const m of MARKETS) await api({action:"submit",name:key(ACTUAL,m.code),pin:S.adminPin,week:v[m.code].w,day:v[m.code].d});
+    await adminCall("reveal",{actualWeek:v.AU.w,actualDay:v.AU.d}); // also closes entries
+    await adminCall("list");
+    adminSay("Revealed. Everyone sees the leaderboard on their next refresh (within 30 seconds).");
+    $("resultsSec").scrollIntoView({behavior:"smooth"});
+  }catch(e){ adminSay(cleanErr(e)+" Entries may be open: tick Entries closed to be safe.",true); }
+  b.disabled=false; b.textContent="Reveal results to everyone";
 });
-$("hideBtn").addEventListener("click",async()=>{ try{ await adminCall("hide"); adminSay("Results hidden again."); }catch(e){ adminSay(e.message,true);} });
+$("hideBtn").addEventListener("click",async()=>{ try{ await adminCall("hide"); adminSay("Results hidden again."); }catch(e){ adminSay(cleanErr(e),true);} });
 $("rGo").addEventListener("click",async()=>{ const name=$("rName").value, pin=$("rPin").value.trim();
   if(!/^\d{4,8}$/.test(pin)){ adminSay("New PIN must be 4 to 8 digits.",true); return; }
-  try{ await adminCall("resetPin",{name,newPin:pin}); $("rPin").value=""; adminSay(`PIN for ${name} updated. Send it to them privately.`); }catch(e){ adminSay(e.message,true);} });
+  try{ for(const m of MARKETS) await adminCall("resetPin",{name:key(name,m.code),newPin:pin}); $("rPin").value=""; adminSay(`PIN for ${name} updated. Send it to them privately.`); }catch(e){ adminSay(cleanErr(e),true);} });
 $("dGo").addEventListener("click",async()=>{ const name=$("rName").value;
-  try{ await adminCall("deleteGuess",{name}); await refresh(); adminSay(`Deleted ${name}'s guess.`); }catch(e){ adminSay(e.message,true);} });
+  try{ for(const m of MARKETS) await adminCall("deleteGuess",{name:key(name,m.code)}); await refresh(); adminSay(`Deleted ${name}'s guesses.`); }catch(e){ adminSay(cleanErr(e),true);} });
 
 /* ---- boot ---- */
 renderRoster(); renderEntry();
@@ -456,7 +547,7 @@ else{
   refresh().then(async()=>{
     const saved=store.get("bf26_me");
     if(saved&&saved.name&&saved.pin){
-      try{ const r=await api({action:"mine",name:saved.name,pin:saved.pin}); S.me=saved.name;S.pin=saved.pin;S.unlocked=true;S.mine=r.guess;S.selected=saved.name; renderRoster(); renderEntry(); }
+      try{ const mine=await loadMine(saved.name,saved.pin); Object.assign(S,{me:saved.name,pin:saved.pin,unlocked:true,mine,selected:saved.name}); renderRoster(); renderEntry(); }
       catch(e){ store.del("bf26_me"); }
     }
   });

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Black Friday Guessing Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Monochrome retail floor: black ground, white type, hard edges, inverted blocks for emphasis */
+  --ink:#000000;
+  --paper:#ffffff;
+  --steel:#848586;
+  --gunmetal:#1c1c1e;
+  --line:#2e2e30;
+  --font:"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--font);-webkit-font-smoothing:antialiased}
+button,input{font-family:inherit}
+:focus-visible{outline:2px solid var(--paper);outline-offset:3px}
+[hidden]{display:none!important}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px 64px}
+
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.bar .l{display:flex;align-items:center;gap:14px}
+.bar b{color:var(--paper);font-weight:700}
+.logo{height:34px;width:auto;display:block}
+.dot{display:inline-block;width:8px;height:8px;background:var(--paper);margin-right:8px;vertical-align:1px}
+
+.setup{margin:20px 0 0;border:1px dashed var(--paper);padding:16px;font-size:13px;line-height:1.6}
+
+.hero{padding:44px 0 28px;display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:end;border-bottom:1px solid var(--line)}
+h1{margin:0;font-size:clamp(40px,8vw,92px);line-height:.88;font-weight:900;letter-spacing:-.04em;text-transform:uppercase;text-wrap:balance}
+h1 .inv{background:var(--paper);color:var(--ink);padding:0 .08em;display:inline-block;transform:skewX(-10deg)}
+h1 .inv span{display:inline-block;transform:skewX(10deg)}
+.lede{margin:16px 0 0;font-size:14px;line-height:1.6;color:#cfcfcf;max-width:52ch}
+.count{border:1px solid var(--paper);padding:16px}
+.count .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+.count .t{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:6px}
+.count .t small{font-size:.45em;color:var(--steel);font-weight:500;margin:0 6px 0 2px}
+.prog{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel)}
+.prog b{font-size:22px;color:var(--paper);letter-spacing:-.02em}
+.meter{height:6px;background:var(--gunmetal);margin-top:8px}
+.meter i{display:block;height:100%;background:var(--paper);width:0;transition:width .4s}
+
+.sec{padding-top:36px}
+.sh{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.sh .n{font-size:12px;color:var(--ink);background:var(--paper);padding:3px 7px;font-weight:700}
+.sh h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
+.sh p{margin:0 0 0 auto;font-size:12px;color:var(--steel)}
+
+.roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.chip{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 12px;background:var(--gunmetal);border:1px solid var(--line);color:var(--paper);font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;cursor:pointer;text-align:left;transition:background .15s,border-color .15s}
+.chip:hover{border-color:var(--paper)}
+.chip .st{font-size:10px;font-weight:500;letter-spacing:.1em;color:var(--steel)}
+.chip.in{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.chip.in .st{color:var(--ink)}
+.chip.me{outline:2px solid var(--paper);outline-offset:2px}
+.chip[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--paper);border-color:var(--paper)}
+.chip.in[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--ink)}
+
+.panel{margin-top:16px;border:1px solid var(--paper);display:grid;grid-template-columns:1fr 1fr}
+.panel .side{padding:22px;border-right:1px solid var(--line)}
+.panel .side:last-child{border-right:0}
+.who{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+.who b{display:block;font-size:30px;letter-spacing:-.02em;color:var(--paper);margin-top:4px;font-weight:900}
+.field{display:grid;gap:6px;margin-top:16px}
+.field label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel)}
+.money{display:flex;align-items:center;border-bottom:2px solid var(--paper)}
+.money span{font-size:28px;font-weight:800;padding-right:4px}
+.money input{flex:1;min-width:0;background:transparent;border:0;color:var(--paper);font-size:28px;font-weight:800;padding:8px 0;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.money input::placeholder{color:#444}
+.money input:focus{outline:none}
+.money:focus-within{box-shadow:0 2px 0 var(--paper)}
+.money.pin input{letter-spacing:.3em}
+.hint{font-size:11px;color:var(--steel);min-height:14px}
+.check{display:flex;align-items:center;gap:8px;font-size:12px;color:#bdbdbd;margin-top:12px;cursor:pointer}
+.check input{width:16px;height:16px;accent-color:#fff}
+.btn{appearance:none;border:1px solid var(--paper);background:var(--paper);color:var(--ink);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:.08em;padding:14px 18px;cursor:pointer}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.ghost{background:transparent;color:var(--paper)}
+.btn.ghost:hover{background:var(--paper);color:var(--ink)}
+.btn.sm{font-size:11px;padding:8px 10px}
+.btn:disabled{opacity:.4;cursor:wait}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:20px}
+.sealed{display:grid;gap:10px;margin-top:14px}
+.seal{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--gunmetal);font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+.seal b{font-size:20px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.rules{font-size:12px;line-height:1.7;color:#bdbdbd;margin:12px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.rules li{padding-left:18px;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;background:var(--paper)}
+.msg{font-size:12px;padding:10px 12px;margin-top:12px;border:1px solid var(--paper)}
+.msg.err{background:var(--paper);color:var(--ink);font-weight:700}
+.empty{padding:22px;border:1px dashed var(--line);color:var(--steel);font-size:13px;margin-top:16px}
+
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pod{border:1px solid var(--paper);padding:18px}
+.pod.main{background:var(--paper);color:var(--ink)}
+.pod .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
+.pod .nm{font-size:28px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;margin-top:8px}
+.pod .v{font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
+.actuals{display:flex;flex-wrap:wrap;gap:24px;margin:0 0 16px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel)}
+.actuals b{display:block;color:var(--paper);font-size:24px;letter-spacing:-.02em;margin-top:2px}
+.tbl{overflow-x:auto;margin-top:16px;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);font-weight:500;background:var(--gunmetal)}
+th:first-child,td:first-child{text-align:left}
+#resTable th:nth-child(2),#resTable td:nth-child(2){text-align:left}
+tr.top td{background:var(--paper);color:var(--ink);font-weight:700}
+
+.admin{margin-top:40px;border:1px dashed var(--steel);padding:20px}
+.admin .tag{display:inline-block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--steel);color:var(--steel);padding:3px 6px}
+.admin h3{margin:10px 0 4px;font-size:18px;text-transform:uppercase}
+.admin p{margin:0;font-size:12px;color:var(--steel);line-height:1.6}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+.toggle{display:flex;align-items:center;gap:10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;margin-top:16px}
+.toggle input{width:18px;height:18px;accent-color:#fff}
+.reset{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.reset select,.reset input{background:var(--gunmetal);color:var(--paper);border:1px solid var(--line);padding:10px;font-family:inherit;font-size:13px}
+
+.foot{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:11px;color:var(--steel);letter-spacing:.06em;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.linkbtn{background:none;border:0;color:var(--steel);font:inherit;text-decoration:underline;cursor:pointer;padding:0;letter-spacing:inherit}
+.linkbtn:hover{color:var(--paper)}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .panel{grid-template-columns:1fr}
+  .panel .side{border-right:0;border-bottom:1px solid var(--line)}
+  .podium{grid-template-columns:1fr}
+  .agrid{grid-template-columns:1fr}
+  .sh p{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="l"><img class="logo" id="logo" src="logo.png" alt="Company logo" hidden><span><span class="dot"></span><b>BF26</b> / Team sweepstake</span></span>
+  <span id="status">Connecting…</span>
+</div>
+
+<div class="wrap">
+  <div class="setup" id="setupNote" hidden>
+    <b>Almost there.</b> Paste your Apps Script web app URL into <code>API_URL</code> near the bottom of <code>index.html</code>, then commit. The README has the steps.
+  </div>
+
+  <header class="hero">
+    <div>
+      <h1>Black Friday<br><span class="inv"><span>Guess</span></span> the number</h1>
+      <p class="lede">Call two numbers: total sales for Black Friday week and for Black Friday day. Use your personal PIN to lock in. Everyone sees that you've played, nobody sees what you said until the reveal.</p>
+    </div>
+    <div class="count" aria-live="polite">
+      <div class="lbl">Doors open, Mon 23 Nov</div>
+      <div class="t" id="cd">--</div>
+      <div class="prog"><span>Locked in</span><b id="lockedN">0/0</b></div>
+      <div class="meter"><i id="meter"></i></div>
+    </div>
+  </header>
+
+  <section class="sec" id="resultsSec" hidden>
+    <div class="sh"><span class="n">RESULTS</span><h2>The reveal</h2></div>
+    <div class="actuals" id="actuals"></div>
+    <div class="podium" id="podium"></div>
+    <div class="tbl"><table id="resTable"></table></div>
+  </section>
+
+  <section class="sec">
+    <div class="sh"><span class="n">01</span><h2>Pick your name</h2><p>White = locked in</p></div>
+    <div class="roster" id="roster" role="group" aria-label="Team members"></div>
+    <div id="entry"></div>
+  </section>
+
+  <section class="admin" id="admin" hidden>
+    <span class="tag">Organiser only</span>
+    <h3>Run the game</h3>
+    <div id="adminLogin">
+      <p>Enter the organiser PIN to manage entries and reveal results.</p>
+      <div class="field" style="max-width:280px"><label for="adminPin">Organiser PIN</label><div class="money pin"><input id="adminPin" type="password" inputmode="numeric" autocomplete="off" maxlength="8"></div></div>
+      <div class="row"><button class="btn" id="adminGo" type="button">Unlock</button></div>
+    </div>
+    <div id="adminBody" hidden>
+      <p>Close entries before trading starts, then enter the actuals and reveal.</p>
+      <label class="toggle" for="closedT"><input type="checkbox" id="closedT"> Entries closed</label>
+      <div class="agrid">
+        <div class="field"><label for="aWeek">Actual BF week $</label><div class="money"><span>$</span><input id="aWeek" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="aWeekH"></div></div>
+        <div class="field"><label for="aDay">Actual BF day $</label><div class="money"><span>$</span><input id="aDay" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="aDayH"></div></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="revealBtn" type="button">Reveal results to everyone</button>
+        <button class="btn ghost" id="hideBtn" type="button" hidden>Hide results again</button>
+        <button class="btn ghost" id="refreshBtn" type="button">Refresh guesses</button>
+      </div>
+      <div class="reset">
+        <div class="field" style="margin:0"><label for="rName">Reset a PIN</label><select id="rName"></select></div>
+        <div class="field" style="margin:0"><label for="rPin">New PIN (4–8 digits)</label><input id="rPin" inputmode="numeric" maxlength="8" autocomplete="off"></div>
+        <button class="btn ghost sm" id="rGo" type="button">Set PIN</button>
+        <button class="btn ghost sm" id="dGo" type="button">Delete their guess</button>
+      </div>
+      <div class="tbl"><table id="allTable"></table></div>
+    </div>
+    <div class="msg" id="adminMsg" hidden></div>
+  </section>
+
+  <div class="foot"><span>Guesses are checked and stored on the server. Overall winner = smallest average % miss across both numbers.</span><button class="linkbtn" id="adminOpen" type="button">Organiser</button></div>
+</div>
+
+<script>
+/* ===== CONFIG: paste your Apps Script web app URL here ===== */
+const API_URL = "https://script.google.com/macros/s/AKfycbzvOenjbRemolwOKiwkuIngaI-UL8Mi8cJXgTBHXciTmcSQUu3jNKQIs7l9WQW3NXmi/exec";
+const DOORS_OPEN = new Date("2026-11-23T00:00:00+11:00");
+const FALLBACK_NAMES = ["Nina","Adrian","Zac","Mladen","Shaina","Pat","Eluan","Mikey","Deb","Chloe","Aleena","Sean","Hamza","Ricky","Elle","Helen","Jack P","Aodhan","Eloise","Tom","Kristy","Sid","Jack Ou"];
+/* =========================================================== */
+
+const $ = id => document.getElementById(id);
+const S = { players: FALLBACK_NAMES.slice(), locked: [], closed:false, revealed:false, status:null,
+            selected:null, me:null, pin:null, mine:null, unlocked:false, editing:false, showMine:false,
+            adminPin:null, all:null };
+const store = { get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}, del(k){try{localStorage.removeItem(k)}catch(e){}} };
+
+/* ---- logo: shows only if logo.png is in the repo ---- */
+(function(){const l=$("logo");l.addEventListener("load",()=>{l.hidden=false});l.addEventListener("error",()=>{l.remove()});if(l.complete&&l.naturalWidth)l.hidden=false})();
+
+/* ---- API ---- */
+const configured = /^https:\/\/script\.google(usercontent)?\.com\//.test(API_URL);
+async function api(body){
+  const res = await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body),redirect:"follow"});
+  if(!res.ok) throw new Error("The game server didn't answer. Try again in a moment.");
+  const j = await res.json();
+  if(!j.ok) throw new Error(j.error||"Something went wrong.");
+  return j.data;
+}
+
+/* ---- money ---- */
+function parseMoney(v){
+  let s=String(v==null?"":v).trim().toLowerCase().replace(/[$,\s]/g,"");
+  if(!s) return NaN;
+  let m=1;
+  if(s.endsWith("m")){m=1e6;s=s.slice(0,-1)} else if(s.endsWith("k")){m=1e3;s=s.slice(0,-1)} else if(s.endsWith("b")){m=1e9;s=s.slice(0,-1)}
+  if(!/^\d*\.?\d+$/.test(s)) return NaN;
+  return Math.round(parseFloat(s)*m);
+}
+const fmt = n => "$"+Math.round(n).toLocaleString("en-AU");
+function hintFor(inp,h){const n=parseMoney(inp.value);h.textContent=inp.value.trim()?(isNaN(n)?"Numbers only, e.g. 1250000 or 1.25m":"= "+fmt(n)):"Tip: 1.25m or 850k works too"}
+const el = (tag,attrs={},kids=[]) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==="text") e.textContent=v; else if(k==="class") e.className=v; else e.setAttribute(k,v);} kids.forEach(c=>e.append(c)); return e; };
+
+/* ---- countdown ---- */
+function tick(){
+  const d=DOORS_OPEN-Date.now();
+  if(d<=0){$("cd").textContent="It's on";return}
+  const dd=Math.floor(d/864e5),hh=Math.floor(d/36e5)%24,mm=Math.floor(d/6e4)%60;
+  $("cd").innerHTML=`${dd}<small>D</small>${String(hh).padStart(2,"0")}<small>H</small>${String(mm).padStart(2,"0")}<small>M</small>`;
+}
+tick(); setInterval(tick,30000);
+
+/* ---- status polling ---- */
+function applyStatus(st){
+  S.status=st; S.players=st.players&&st.players.length?st.players:S.players; S.locked=st.locked||[];
+  S.closed=!!st.closed; S.revealed=!!st.revealed;
+  if(S.closed) S.editing=false;
+  renderRoster(); if(!S.editing) renderEntry(); renderResults(); renderAdminState();
+}
+async function refresh(){
+  if(!configured) return;
+  try{ applyStatus(await api({action:"status"})); $("status").textContent="Live"; }
+  catch(e){ $("status").textContent="Can't reach the game"; }
+}
+
+/* ---- roster ---- */
+function renderRoster(){
+  const r=$("roster"); r.replaceChildren();
+  S.players.forEach(name=>{
+    const isIn=S.locked.includes(name), mine=S.unlocked&&S.me===name;
+    const b=el("button",{type:"button",class:"chip"+(isIn?" in":"")+(mine?" me":""),"aria-pressed":String(S.selected===name)},[
+      el("span",{text:name}), el("span",{class:"st",text: mine?(isIn?"YOU ✓":"YOU"): isIn?"LOCKED ✓":"OPEN"})
+    ]);
+    b.addEventListener("click",()=>{
+      if(S.unlocked && S.me!==name){ signOut(false); }
+      S.selected=name; S.editing=false; renderRoster(); renderEntry();
+      setTimeout(()=>{const p=$("pinIn");if(p)p.focus({preventScroll:true}); $("entry").scrollIntoView({behavior:"smooth",block:"nearest"})},0);
+    });
+    r.append(b);
+  });
+  $("lockedN").textContent=`${S.locked.length}/${S.players.length}`;
+  $("meter").style.width=(S.players.length?S.locked.length/S.players.length*100:0)+"%";
+}
+
+/* ---- entry ---- */
+const RULES = () => `<ul class="rules"><li>Two numbers: BF week total and BF day total, in dollars.</li><li>Change your guess any time until the organiser closes entries.</li><li>Closest overall (average % miss) wins. Prizes for closest week and closest day too.</li></ul>`;
+function msgBox(id){ return `<div class="msg" id="${id}" hidden></div>`; }
+function say(id,text,err){ const m=$(id); if(!m) return; m.textContent=text; m.hidden=!text; m.classList.toggle("err",!!err); }
+
+function renderEntry(){
+  const e=$("entry");
+  if(!configured){ e.innerHTML=`<div class="empty">The game isn't connected yet. See the note at the top.</div>`; return; }
+  const name = S.unlocked ? S.me : S.selected;
+  if(!name){ e.innerHTML=`<div class="empty">${S.closed?"Entries are closed. ":""}Tap your name above, then enter your PIN.</div>`; return; }
+
+  if(!S.unlocked){
+    e.innerHTML=`<div class="panel"><div class="side">
+      <div class="who">Playing as<b></b></div>
+      <div class="field"><label for="pinIn">Your PIN</label><div class="money pin"><input id="pinIn" type="password" inputmode="numeric" autocomplete="off" maxlength="8"></div><div class="hint">The PIN the organiser sent you.</div></div>
+      <label class="check" for="remember"><input type="checkbox" id="remember" checked> Remember me on this device</label>
+      <div class="row"><button class="btn" id="unlockBtn" type="button">Unlock</button><button class="btn ghost" id="notMe" type="button">Not me</button></div>
+      ${msgBox("entryMsg")}
+    </div><div class="side"><div class="who">How it works</div>${RULES()}</div></div>`;
+    e.querySelector(".who b").textContent=name;
+    const go=()=>unlock(name,$("pinIn").value.trim(),$("remember").checked);
+    $("unlockBtn").addEventListener("click",go);
+    $("pinIn").addEventListener("keydown",ev=>{if(ev.key==="Enter")go()});
+    $("notMe").addEventListener("click",()=>{S.selected=null;renderRoster();renderEntry()});
+    return;
+  }
+
+  const editing = !S.closed && (S.editing || !S.mine);
+  if(editing){
+    e.innerHTML=`<div class="panel"><div class="side">
+      <div class="who">Playing as<b></b></div>
+      <div class="field"><label for="gWeek">Black Friday week $</label><div class="money"><span>$</span><input id="gWeek" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="gWeekH">Tip: 1.25m or 850k works too</div></div>
+      <div class="field"><label for="gDay">Black Friday day $</label><div class="money"><span>$</span><input id="gDay" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="gDayH">Tip: 1.25m or 850k works too</div></div>
+      <div class="row"><button class="btn" id="lockBtn" type="button">Lock it in</button>${S.mine?`<button class="btn ghost" id="cancelBtn" type="button">Cancel</button>`:""}<button class="btn ghost" id="outBtn" type="button">Sign out</button></div>
+      ${msgBox("entryMsg")}
+    </div><div class="side"><div class="who">How it works</div>${RULES()}</div></div>`;
+    e.querySelector(".who b").textContent=name;
+    const w=$("gWeek"),d=$("gDay");
+    if(S.mine){w.value=S.mine.week;d.value=S.mine.day}
+    [[w,$("gWeekH")],[d,$("gDayH")]].forEach(([i,h])=>{i.addEventListener("input",()=>hintFor(i,h)); if(i.value) hintFor(i,h)});
+    $("lockBtn").addEventListener("click",submit);
+    if($("cancelBtn")) $("cancelBtn").addEventListener("click",()=>{S.editing=false;renderEntry()});
+    $("outBtn").addEventListener("click",()=>signOut(true));
+    w.focus({preventScroll:true});
+  } else {
+    const g=S.mine, show=S.showMine;
+    e.innerHTML=`<div class="panel"><div class="side">
+      <div class="who">${g?"Locked in":"Entries closed"}<b></b></div>
+      ${g?`<div class="sealed">
+        <div class="seal"><span>BF week</span><b>${show?fmt(g.week):"$ ••••••"}</b></div>
+        <div class="seal"><span>BF day</span><b>${show?fmt(g.day):"$ ••••••"}</b></div>
+      </div>`:`<p class="lede" style="font-size:12px">You didn't lock in a guess before entries closed.</p>`}
+      <div class="row">
+        ${g?`<button class="btn ghost" id="peekMine" type="button">${show?"Hide":"Show"} my guess</button>`:""}
+        ${S.closed?"":`<button class="btn" id="editBtn" type="button">Change guess</button>`}
+        <button class="btn ghost" id="outBtn" type="button">Sign out</button>
+      </div>
+      ${msgBox("entryMsg")}
+    </div><div class="side"><div class="who">${S.closed?"Entries closed":"You're in"}</div>${S.closed?`<p class="lede" style="font-size:12px">No more changes. Results land at the top of this page once the organiser reveals.</p>`:RULES()}</div></div>`;
+    e.querySelector(".who b").textContent=name+(g?" ✓":"");
+    if($("peekMine")) $("peekMine").addEventListener("click",()=>{S.showMine=!S.showMine;renderEntry()});
+    if($("editBtn")) $("editBtn").addEventListener("click",()=>{S.editing=true;renderEntry()});
+    $("outBtn").addEventListener("click",()=>signOut(true));
+  }
+}
+
+async function unlock(name,pin,remember){
+  if(!/^\d{4,8}$/.test(pin)){ say("entryMsg","Enter your PIN (numbers only).",true); return; }
+  const b=$("unlockBtn"); b.disabled=true; b.textContent="Checking…";
+  try{
+    const r=await api({action:"mine",name,pin});
+    S.me=name; S.pin=pin; S.unlocked=true; S.mine=r.guess; S.selected=name; S.showMine=false; S.editing=false;
+    if(remember) store.set("bf26_me",{name,pin}); else store.del("bf26_me");
+    renderRoster(); renderEntry();
+  }catch(err){ say("entryMsg",err.message,true); b.disabled=false; b.textContent="Unlock"; }
+}
+function signOut(clearSel){
+  S.me=null;S.pin=null;S.unlocked=false;S.mine=null;S.editing=false;S.showMine=false; if(clearSel) S.selected=null;
+  store.del("bf26_me"); renderRoster(); renderEntry();
+}
+async function submit(){
+  const week=parseMoney($("gWeek").value), day=parseMoney($("gDay").value);
+  if(isNaN(week)||week<=0){ say("entryMsg","Enter your Black Friday week number.",true); $("gWeek").focus(); return; }
+  if(isNaN(day)||day<=0){ say("entryMsg","Enter your Black Friday day number.",true); $("gDay").focus(); return; }
+  if(day>week){ say("entryMsg","Your day guess is bigger than your week guess. Double-check it.",true); return; }
+  const b=$("lockBtn"); b.disabled=true; b.textContent="Locking…";
+  try{
+    const r=await api({action:"submit",name:S.me,pin:S.pin,week,day});
+    S.mine=r.guess; S.editing=false; S.showMine=false;
+    if(!S.locked.includes(S.me)) S.locked=S.locked.concat(S.me);
+    renderRoster(); renderEntry(); say("entryMsg","Locked in. Your numbers are sealed.");
+    refresh();
+  }catch(err){ say("entryMsg",err.message,true); b.disabled=false; b.textContent="Lock it in"; }
+}
+
+/* ---- results ---- */
+function renderResults(){
+  const st=S.status||{}, sec=$("resultsSec");
+  if(!st.revealed||!Array.isArray(st.results)||!(st.actualWeek>0)||!(st.actualDay>0)){ sec.hidden=true; return; }
+  sec.hidden=false;
+  const aw=st.actualWeek, ad=st.actualDay;
+  const rows=st.results.filter(r=>r.week>0&&r.day>0).map(r=>{const ew=Math.abs(r.week-aw)/aw*100, ed=Math.abs(r.day-ad)/ad*100; return {...r,ew,ed,avg:(ew+ed)/2}});
+  $("actuals").innerHTML=`<div>Actual BF week<b>${fmt(aw)}</b></div><div>Actual BF day<b>${fmt(ad)}</b></div><div>Players<b>${rows.length}</b></div>`;
+  if(!rows.length){ $("podium").replaceChildren(); $("resTable").replaceChildren(); return; }
+  const best=k=>rows.slice().sort((a,b)=>a[k]-b[k])[0];
+  const o=best("avg"), w=best("ew"), d=best("ed");
+  const pod=(cls,k,nm,v)=>el("div",{class:"pod"+cls},[el("div",{class:"k",text:k}),el("div",{class:"nm",text:nm}),el("div",{class:"v",text:v})]);
+  $("podium").replaceChildren(
+    pod(" main","Overall winner",o.name,`Avg miss ${o.avg.toFixed(1)}%`),
+    pod("","Closest BF week",w.name,`${fmt(w.week)} · off ${w.ew.toFixed(1)}%`),
+    pod("","Closest BF day",d.name,`${fmt(d.day)} · off ${d.ed.toFixed(1)}%`));
+  const t=$("resTable"); t.replaceChildren();
+  t.append(el("thead",{},[el("tr",{},["#","Name","Week guess","Miss","Day guess","Miss","Avg miss"].map(h=>el("th",{text:h})))]));
+  const tb=el("tbody");
+  rows.sort((a,b)=>a.avg-b.avg).forEach((r,i)=>tb.append(el("tr",{class:i===0?"top":""},[i+1,r.name,fmt(r.week),r.ew.toFixed(1)+"%",fmt(r.day),r.ed.toFixed(1)+"%",r.avg.toFixed(1)+"%"].map(v=>el("td",{text:String(v)})))));
+  t.append(tb);
+}
+
+/* ---- organiser ---- */
+function adminSay(t,err){ say("adminMsg",t,err); }
+$("adminOpen").addEventListener("click",()=>{ $("admin").hidden=!$("admin").hidden; if(!$("admin").hidden){ $("admin").scrollIntoView({behavior:"smooth"}); if(!S.adminPin) $("adminPin").focus({preventScroll:true}); } });
+$("adminGo").addEventListener("click",adminLogin);
+$("adminPin").addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin()});
+async function adminLogin(){
+  const pin=$("adminPin").value.trim(); if(!pin) return;
+  try{ const r=await api({action:"admin",adminPin:pin,op:"list"}); S.adminPin=pin; S.all=r.guesses; applyStatus(r.status);
+       $("adminLogin").hidden=true; $("adminBody").hidden=false; adminSay(""); renderAll(); }
+  catch(e){ adminSay(e.message,true); }
+}
+async function adminCall(op,extra){ const r=await api({action:"admin",adminPin:S.adminPin,op,...(extra||{})}); if(r.status) applyStatus(r.status); if(r.guesses){S.all=r.guesses;renderAll()} return r; }
+function renderAdminState(){
+  if(!S.adminPin) return;
+  $("closedT").checked=S.closed; $("hideBtn").hidden=!S.revealed;
+  const sel=$("rName"); if(!sel.options.length) S.players.forEach(n=>sel.append(el("option",{value:n,text:n})));
+}
+function renderAll(){
+  const t=$("allTable"); t.replaceChildren();
+  const rows=(S.all||[]).slice().sort((a,b)=>a.name.localeCompare(b.name));
+  t.append(el("thead",{},[el("tr",{},["Name","Updated","BF week","BF day"].map(h=>el("th",{text:h})))]));
+  const tb=el("tbody");
+  if(!rows.length) tb.append(el("tr",{},[el("td",{text:"No guesses yet."})]));
+  rows.forEach(r=>tb.append(el("tr",{},[r.name, r.at?new Date(r.at).toLocaleString("en-AU",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"", fmt(r.week), fmt(r.day)].map(v=>el("td",{text:v})))));
+  t.append(tb); renderAdminState();
+}
+$("closedT").addEventListener("change",async e=>{ try{ await adminCall("close",{closed:e.target.checked}); adminSay(e.target.checked?"Entries closed. Nobody can change their guess now.":"Entries reopened."); }catch(err){ e.target.checked=S.closed; adminSay(err.message,true);} });
+[["aWeek","aWeekH"],["aDay","aDayH"]].forEach(([i,h])=>$(i).addEventListener("input",()=>hintFor($(i),$(h))));
+$("refreshBtn").addEventListener("click",async()=>{ try{ await adminCall("list"); adminSay("Guesses refreshed."); }catch(e){ adminSay(e.message,true);} });
+$("revealBtn").addEventListener("click",async()=>{
+  const aw=parseMoney($("aWeek").value), ad=parseMoney($("aDay").value);
+  if(isNaN(aw)||aw<=0||isNaN(ad)||ad<=0){ adminSay("Enter both actual numbers first.",true); return; }
+  try{ await adminCall("reveal",{actualWeek:aw,actualDay:ad}); adminSay("Revealed. Everyone sees the leaderboard on their next refresh (within 30 seconds)."); $("resultsSec").scrollIntoView({behavior:"smooth"}); }
+  catch(e){ adminSay(e.message,true); }
+});
+$("hideBtn").addEventListener("click",async()=>{ try{ await adminCall("hide"); adminSay("Results hidden again."); }catch(e){ adminSay(e.message,true);} });
+$("rGo").addEventListener("click",async()=>{ const name=$("rName").value, pin=$("rPin").value.trim();
+  if(!/^\d{4,8}$/.test(pin)){ adminSay("New PIN must be 4 to 8 digits.",true); return; }
+  try{ await adminCall("resetPin",{name,newPin:pin}); $("rPin").value=""; adminSay(`PIN for ${name} updated. Send it to them privately.`); }catch(e){ adminSay(e.message,true);} });
+$("dGo").addEventListener("click",async()=>{ const name=$("rName").value;
+  try{ await adminCall("deleteGuess",{name}); await refresh(); adminSay(`Deleted ${name}'s guess.`); }catch(e){ adminSay(e.message,true);} });
+
+/* ---- boot ---- */
+renderRoster(); renderEntry();
+if(!configured){ $("setupNote").hidden=false; $("status").textContent="Not connected"; }
+else{
+  refresh().then(async()=>{
+    const saved=store.get("bf26_me");
+    if(saved&&saved.name&&saved.pin){
+      try{ const r=await api({action:"mine",name:saved.name,pin:saved.pin}); S.me=saved.name;S.pin=saved.pin;S.unlocked=true;S.mine=r.guess;S.selected=saved.name; renderRoster(); renderEntry(); }
+      catch(e){ store.del("bf26_me"); }
+    }
+  });
+  setInterval(()=>{ if(!document.hidden) refresh(); },30000);
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refresh(); });
+}
+</script>
+</body>
+</html>

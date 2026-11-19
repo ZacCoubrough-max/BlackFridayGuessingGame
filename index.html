@@ -340,6 +340,7 @@ function renderEntry(){
 
   const editing = !S.closed && (S.editing || !hasAll());
   if(editing){
+    S.editing = true; // keep the form (and anything typed) while the page checks for updates
     const block = m => `<div class="mkt"><h4><span class="em">${m.emoji}</span>${m.label}</h4><div class="pair">
       <div class="field"><label for="w${m.code}">BF week $</label><div class="money"><span>$</span><input id="w${m.code}" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="w${m.code}H">Tip: 1.25m or 850k works too</div></div>
       <div class="field"><label for="d${m.code}">BF day $</label><div class="money"><span>$</span><input id="d${m.code}" inputmode="decimal" autocomplete="off" placeholder="0"></div><div class="hint" id="d${m.code}H"></div></div>

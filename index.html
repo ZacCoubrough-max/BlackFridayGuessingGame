@@ -172,6 +172,7 @@ td.best{text-decoration:underline;text-underline-offset:3px}
 
   <section class="sec" id="resultsSec" hidden>
     <div class="sh"><span class="n">RESULTS</span><h2>The reveal</h2></div>
+    <p class="lede" id="resNote" style="margin:0 0 16px;font-size:12px"></p>
     <div class="actuals" id="actuals"></div>
     <div class="podium" id="podium"></div>
     <div class="tbl"><table id="resTable"></table></div>
@@ -192,11 +193,11 @@ td.best{text-decoration:underline;text-underline-offset:3px}
       <div class="row"><button class="btn" id="adminGo" type="button">Unlock</button></div>
     </div>
     <div id="adminBody" hidden>
-      <p>Close entries before trading starts, then enter all four actuals and reveal.</p>
+      <p>1. Tick Entries closed once everyone is locked in. 2. Click Reveal to show everyone's guesses. 3. As sales come in, type them below (leave any box blank if it's not in yet) and click Update standings.</p>
       <label class="toggle" for="closedT"><input type="checkbox" id="closedT"> Entries closed</label>
       <div id="actualFields"></div>
       <div class="row">
-        <button class="btn" id="revealBtn" type="button">Reveal results to everyone</button>
+        <button class="btn" id="revealBtn" type="button">Reveal guesses to everyone</button>
         <button class="btn ghost" id="hideBtn" type="button" hidden>Hide results again</button>
         <button class="btn ghost" id="refreshBtn" type="button">Refresh guesses</button>
       </div>
@@ -284,7 +285,10 @@ function applyStatus(st){
 async function refresh(){
   if(!configured) return;
   try{ applyStatus(await api({action:"status"})); $("status").textContent="Live"; }
-  catch(e){ $("status").textContent="Can't reach the game"; }
+  catch(e){
+    $("status").textContent="Can't reach the game";
+    if(!S.players.length) $("entry").innerHTML=`<div class="empty">The game server said: <b></b><br>Tell the organiser.</div>`, $("entry").querySelector("b").textContent=cleanErr(e);
+  }
 }
 
 /* ---- roster ---- */
@@ -373,10 +377,11 @@ function renderEntry(){
         <button class="btn ghost" id="outBtn" type="button">Sign out</button>
       </div>
       <div class="msg" id="entryMsg" hidden></div>
-    </div><div class="side"><div class="who">${S.closed?"Entries closed":"You're in"}</div>${S.closed?`<p class="lede" style="font-size:12px">No more changes. Results land at the top of this page once the organiser reveals.</p>`:RULES()}</div></div>`;
+    </div><div class="side"><div class="who">${S.closed?"Entries closed":"You're in"}</div>${S.closed?`<p class="lede" style="font-size:12px">No more changes. Everyone's guesses appear at the top of this page once the organiser reveals them.</p>`:RULES()}</div></div>`;
     e.querySelector(".who b").textContent=name+(hasAll()?" ✓":"");
+    if(S.flash){ say("entryMsg",S.flash); }
     if($("peekMine")) $("peekMine").addEventListener("click",()=>{S.showMine=!S.showMine;renderEntry()});
-    if($("editBtn")) $("editBtn").addEventListener("click",()=>{S.editing=true;renderEntry()});
+    if($("editBtn")) $("editBtn").addEventListener("click",()=>{S.flash="";S.editing=true;renderEntry()});
     $("outBtn").addEventListener("click",()=>signOut(true));
   }
 }
@@ -397,7 +402,7 @@ async function unlock(name,pin,remember){
   }catch(err){ say("entryMsg",cleanErr(err),true); b.disabled=false; b.textContent="Unlock"; }
 }
 function signOut(clearSel){
-  Object.assign(S,{me:null,pin:null,unlocked:false,mine:{},editing:false,showMine:false}); if(clearSel) S.selected=null;
+  S.flash=""; Object.assign(S,{me:null,pin:null,unlocked:false,mine:{},editing:false,showMine:false}); if(clearSel) S.selected=null;
   store.del("bf26_me"); renderRoster(); renderEntry();
 }
 async function submit(){
@@ -417,62 +422,74 @@ async function submit(){
       if(!S.lockedKeys.includes(key(S.me,m.code))) S.lockedKeys=S.lockedKeys.concat(key(S.me,m.code));
     }
     S.editing=false; S.showMine=false;
-    renderRoster(); renderEntry(); say("entryMsg","All 4 locked in. Your numbers are sealed.");
+    S.flash="All 4 locked in. Your numbers are sealed."; renderRoster(); renderEntry();
     refresh();
   }catch(err){ say("entryMsg",cleanErr(err)+(MARKETS.some(m=>S.mine[m.code])?" Some guesses may have saved: check and lock in again.":""),true); b.disabled=false; b.textContent="Lock all 4 in"; }
 }
 
 /* ---- results ---- */
+// A sales figure of 1 or less means "not in yet" (the server needs a number above 0 to save).
+const known = v => typeof v==="number" && v>1;
 function scoreRows(results){
   const byKey={}; results.forEach(r=>byKey[r.name]=r);
-  const act={}; MARKETS.forEach(m=>act[m.code]=byKey[key(ACTUAL,m.code)]);
-  if(MARKETS.some(m=>!act[m.code]||!(act[m.code].week>0)||!(act[m.code].day>0))) return null;
+  const act={}; MARKETS.forEach(m=>{const a=byKey[key(ACTUAL,m.code)]; act[m.code]={week:a&&known(a.week)?a.week:null, day:a&&known(a.day)?a.day:null};});
   const people={};
   results.forEach(r=>{const p=split(r.name); if(!p||p.name===ACTUAL) return; (people[p.name]=people[p.name]||{name:p.name})[p.m]=r;});
-  const miss=(g,a)=>Math.abs(g-a)/a*100;
+  const miss=(g,a)=>a?Math.abs(g-a)/a*100:null;
+  const mean=a=>{a=a.filter(x=>x!==null); return a.length?a.reduce((s,x)=>s+x,0)/a.length:null;};
   const rows=Object.values(people).filter(p=>MARKETS.every(m=>p[m.code])).map(p=>{
     const o={name:p.name};
     MARKETS.forEach(m=>{const g=p[m.code],a=act[m.code];
       o[m.code]={week:g.week,day:g.day,ew:miss(g.week,a.week),ed:miss(g.day,a.day)};
-      o[m.code].avg=(o[m.code].ew+o[m.code].ed)/2;});
-    o.avg=MARKETS.reduce((s,m)=>s+o[m.code].avg,0)/MARKETS.length;
+      o[m.code].avg=mean([o[m.code].ew,o[m.code].ed]);});
+    o.avg=mean(MARKETS.flatMap(m=>[o[m.code].ew,o[m.code].ed]));
     return o;
   });
-  return {act,rows};
+  const anyActual=MARKETS.some(m=>act[m.code].week||act[m.code].day);
+  const allActual=MARKETS.every(m=>act[m.code].week&&act[m.code].day);
+  return {act,rows,anyActual,allActual};
 }
 function renderResults(){
   const st=S.status||{}, sec=$("resultsSec");
-  const sc = st.revealed&&Array.isArray(st.results) ? scoreRows(st.results) : null;
-  if(!sc){ sec.hidden=true; return; }
+  if(!st.revealed||!Array.isArray(st.results)){ sec.hidden=true; return; }
   sec.hidden=false;
-  const {act,rows}=sc;
+  const {act,rows,anyActual,allActual}=scoreRows(st.results);
+  sec.querySelector("h2").textContent = !anyActual ? "Everyone's guesses" : allActual ? "The results" : "Live standings";
+  $("resNote").textContent = !anyActual ? "Guesses are locked. Sales figures will appear here as they come in."
+    : allActual ? "Based on the sales figures entered by the organiser."
+    : "Based on the sales figures in so far. Standings will move as more numbers come in.";
   $("actuals").replaceChildren(...MARKETS.flatMap(m=>[
-    el("div",{},[document.createTextNode(`${m.emoji} ${m.code} week`),el("b",{text:fmt(act[m.code].week)})]),
-    el("div",{},[document.createTextNode(`${m.emoji} ${m.code} day`),el("b",{text:fmt(act[m.code].day)})])]));
-  if(!rows.length){ $("podium").replaceChildren(); $("resTable").replaceChildren(); return; }
-  const best=f=>rows.slice().sort((a,b)=>f(a)-f(b))[0];
-  const o=best(r=>r.avg);
+    el("div",{},[document.createTextNode(`${m.emoji} ${m.code} week`),el("b",{text:act[m.code].week?fmt(act[m.code].week):"Not in yet"})]),
+    el("div",{},[document.createTextNode(`${m.emoji} ${m.code} day`),el("b",{text:act[m.code].day?fmt(act[m.code].day):"Not in yet"})])]));
   const pod=(cls,k,nm,v)=>el("div",{class:"pod"+cls},[el("div",{class:"k",text:k}),el("div",{class:"nm",text:nm}),el("div",{class:"v",text:v})]);
-  $("podium").replaceChildren(
-    pod(" main","Overall winner",o.name,`Avg miss ${o.avg.toFixed(1)}% across all 4`),
-    ...MARKETS.map(m=>{const w=best(r=>r[m.code].avg);return pod("",`Best ${m.emoji} ${m.label}`,w.name,`Week off ${w[m.code].ew.toFixed(1)}% · day off ${w[m.code].ed.toFixed(1)}%`)}));
-  const mins={}; MARKETS.forEach(m=>["ew","ed"].forEach(f=>mins[m.code+f]=Math.min(...rows.map(r=>r[m.code][f]))));
+  const best=f=>rows.filter(r=>f(r)!==null).sort((a,b)=>f(a)-f(b))[0];
+  const pods=[];
+  if(rows.length&&anyActual){
+    const o=best(r=>r.avg); if(o) pods.push(pod(" main",allActual?"Overall winner":"Leading overall",o.name,`Avg miss ${o.avg.toFixed(1)}%`));
+    MARKETS.forEach(m=>{const w=best(r=>r[m.code].avg); if(w) pods.push(pod("",`${allActual?"Best":"Leading"} ${m.emoji} ${m.label}`,w.name,`Avg miss ${w[m.code].avg.toFixed(1)}%`));});
+  }
+  $("podium").replaceChildren(...pods); $("podium").hidden=!pods.length;
   const t=$("resTable"); t.replaceChildren();
-  t.append(el("thead",{},[el("tr",{},["#","Name",...MARKETS.flatMap(m=>[`${m.emoji} week`,"Miss",`${m.emoji} day`,"Miss"]),"Avg miss"].map(h=>el("th",{text:h})))]));
+  if(!rows.length) return;
+  const mins={}; MARKETS.forEach(m=>["ew","ed"].forEach(f=>{const v=rows.map(r=>r[m.code][f]).filter(x=>x!==null); mins[m.code+f]=v.length?Math.min(...v):null;}));
+  const pct=v=>v===null?"–":v.toFixed(1)+"%";
+  const head=["#","Name",...MARKETS.flatMap(m=>[`${m.emoji} week`,...(act[m.code].week?["Miss"]:[]),`${m.emoji} day`,...(act[m.code].day?["Miss"]:[])]),...(anyActual?["Avg miss"]:[])];
+  t.append(el("thead",{},[el("tr",{},head.map(h=>el("th",{text:h})))]));
   const tb=el("tbody");
-  rows.sort((a,b)=>a.avg-b.avg).forEach((r,i)=>{
-    const cells=[el("td",{text:String(i+1)}),el("td",{text:r.name})];
+  const sorted=anyActual?rows.slice().sort((a,b)=>(a.avg??1e9)-(b.avg??1e9)):rows.slice().sort((a,b)=>a.name.localeCompare(b.name));
+  sorted.forEach((r,i)=>{
+    const cells=[el("td",{text:anyActual?String(i+1):"–"}),el("td",{text:r.name})];
     MARKETS.forEach(m=>{const x=r[m.code];
-      cells.push(el("td",{text:fmt(x.week)}),el("td",{class:x.ew===mins[m.code+"ew"]?"best":"",text:x.ew.toFixed(1)+"%"}),
-                 el("td",{text:fmt(x.day)}),el("td",{class:x.ed===mins[m.code+"ed"]?"best":"",text:x.ed.toFixed(1)+"%"}));});
-    cells.push(el("td",{text:r.avg.toFixed(1)+"%"}));
-    tb.append(el("tr",{class:i===0?"top":""},cells));
+      cells.push(el("td",{text:fmt(x.week)})); if(act[m.code].week) cells.push(el("td",{class:x.ew===mins[m.code+"ew"]?"best":"",text:pct(x.ew)}));
+      cells.push(el("td",{text:fmt(x.day)}));  if(act[m.code].day)  cells.push(el("td",{class:x.ed===mins[m.code+"ed"]?"best":"",text:pct(x.ed)}));});
+    if(anyActual) cells.push(el("td",{text:pct(r.avg)}));
+    tb.append(el("tr",{class:anyActual&&i===0?"top":""},cells));
   });
   t.append(tb);
 }
 
 /* ---- organiser ---- */
-$("actualFields").innerHTML = MARKETS.map(m=>`<div class="mkt"><h4><span class="em">${m.emoji}</span>Actual ${m.label}</h4><div class="pair">
+$("actualFields").innerHTML = MARKETS.map(m=>`<div class="mkt"><h4><span class="em">${m.emoji}</span>${m.label} sales so far</h4><div class="pair">
   <div class="field"><label for="a${m.code}w">BF week $</label><div class="money"><span>$</span><input id="a${m.code}w" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="a${m.code}wH"></div></div>
   <div class="field"><label for="a${m.code}d">BF day $</label><div class="money"><span>$</span><input id="a${m.code}d" inputmode="decimal" placeholder="0" autocomplete="off"></div><div class="hint" id="a${m.code}dH"></div></div>
 </div></div>`).join("");
@@ -490,11 +507,12 @@ async function adminLogin(){
 }
 async function adminCall(op,extra){ const r=await api({action:"admin",adminPin:S.adminPin,op,...(extra||{})}); if(r.status) applyStatus(r.status); if(r.guesses){S.all=r.guesses;renderAll()} return r; }
 function fillActuals(){
-  (S.all||[]).forEach(g=>{const p=split(g.name); if(p&&p.name===ACTUAL){ const w=$("a"+p.m+"w"),d=$("a"+p.m+"d"); if(w&&!w.value){w.value=g.week;hintFor(w,$("a"+p.m+"wH"))} if(d&&!d.value){d.value=g.day;hintFor(d,$("a"+p.m+"dH"))} }});
+  (S.all||[]).forEach(g=>{const p=split(g.name); if(p&&p.name===ACTUAL){ const w=$("a"+p.m+"w"),d=$("a"+p.m+"d"); if(w&&!w.value&&g.week>1){w.value=g.week;hintFor(w,$("a"+p.m+"wH"))} if(d&&!d.value&&g.day>1){d.value=g.day;hintFor(d,$("a"+p.m+"dH"))} }});
 }
 function renderAdminState(){
   if(!S.adminPin) return;
   $("closedT").checked=S.closed; $("hideBtn").hidden=!S.revealed;
+  $("revealBtn").textContent=S.revealed?"Update standings":"Reveal guesses to everyone"; $("revealBtn").disabled=!S.closed&&!S.revealed; $("revealBtn").title=S.closed||S.revealed?"":"Tick Entries closed first";
   const sel=$("rName"); if(!sel.options.length) S.players.forEach(n=>sel.append(el("option",{value:n,text:n})));
 }
 function renderAll(){
@@ -515,23 +533,26 @@ function renderAll(){
 $("closedT").addEventListener("change",async e=>{ try{ await adminCall("close",{closed:e.target.checked}); adminSay(e.target.checked?"Entries closed. Nobody can change their guesses now.":"Entries reopened."); }catch(err){ e.target.checked=S.closed; adminSay(cleanErr(err),true);} });
 $("refreshBtn").addEventListener("click",async()=>{ try{ await adminCall("list"); adminSay("Guesses refreshed."); }catch(e){ adminSay(cleanErr(e),true);} });
 $("revealBtn").addEventListener("click",async()=>{
-  const v={};
+  const v={}; let anyIn=false;
   for(const m of MARKETS){
-    const w=parseMoney($("a"+m.code+"w").value), d=parseMoney($("a"+m.code+"d").value);
-    if(!(w>0)||!(d>0)){ adminSay(`Enter both ${m.emoji} ${m.label} actuals first.`,true); return; }
-    v[m.code]={w,d};
+    const rw=$("a"+m.code+"w").value.trim(), rd=$("a"+m.code+"d").value.trim();
+    const w=rw?parseMoney(rw):0, d=rd?parseMoney(rd):0;
+    if((rw&&!(w>1))||(rd&&!(d>1))){ adminSay(`Check the ${m.emoji} ${m.label} numbers: whole dollars only, or leave a box blank.`,true); return; }
+    v[m.code]={w:w||1,d:d||1}; if(w||d) anyIn=true;
   }
-  const b=$("revealBtn"); b.disabled=true; b.textContent="Revealing…";
+  const b=$("revealBtn"); b.disabled=true; b.textContent=S.revealed?"Updating…":"Revealing…";
   try{
-    // Actuals are saved as the hidden "_ACTUAL" entries, which need entries open for a moment.
+    // Sales figures are saved as the hidden "_ACTUAL" entries. Saving needs entries open for a moment,
+    // so results are hidden first: nobody can see other guesses while entries are briefly open.
+    if(S.revealed) await adminCall("hide");
     if(S.closed) await adminCall("close",{closed:false});
     for(const m of MARKETS) await api({action:"submit",name:key(ACTUAL,m.code),pin:S.adminPin,week:v[m.code].w,day:v[m.code].d});
     await adminCall("reveal",{actualWeek:v.AU.w,actualDay:v.AU.d}); // also closes entries
     await adminCall("list");
-    adminSay("Revealed. Everyone sees the leaderboard on their next refresh (within 30 seconds).");
+    adminSay((anyIn?"Standings updated.":"Guesses revealed. Add sales figures whenever they come in and click Update standings.")+" Everyone sees it within 30 seconds.");
     $("resultsSec").scrollIntoView({behavior:"smooth"});
   }catch(e){ adminSay(cleanErr(e)+" Entries may be open: tick Entries closed to be safe.",true); }
-  b.disabled=false; b.textContent="Reveal results to everyone";
+  b.disabled=false; renderAdminState();
 });
 $("hideBtn").addEventListener("click",async()=>{ try{ await adminCall("hide"); adminSay("Results hidden again."); }catch(e){ adminSay(cleanErr(e),true);} });
 $("rGo").addEventListener("click",async()=>{ const name=$("rName").value, pin=$("rPin").value.trim();
